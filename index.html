@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather + Time App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <video id="bgVideo" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;">
+    <source src="https://cdn.coverr.co/videos/coverr-nature-scenery-3026/1080p.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="container">
+    <h1>🌤️ Weather </h1>
+
+    <div class="search-section">
+      <input id="cityInput" list="citySuggestions" placeholder="Enter city..." />
+      <datalist id="citySuggestions"></datalist>
+      <button onclick="getWeather()">Search</button>
+      <button onclick="getLocationWeather()">📍 My Location</button>
+      <button onclick="resetWeather()">Reset</button>
+      <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    </div>
+
+    <div id="weatherResult" class="weather-box hidden">
+      <h2 id="cityName"></h2>
+      <div class="weather-info">
+        <img id="icon" src="" alt="Weather Icon" />
+        <div><strong>🌡️ Temp:</strong> <span id="temp"></span> °C</div>
+        <div><strong>🌦️ Condition:</strong> <span id="condition"></span></div>
+        <div><strong>💧 Humidity:</strong> <span id="humidity"></span>%</div>
+        <div><strong>🌬️ Wind:</strong> <span id="wind"></span> m/s</div>
+      </div>
+      <div id="localTime" class="local-time"></div>
+    </div>
+
+    <!-- ✅ Make sure this section is outside weatherResult to always be visible -->
+    
+    <div id="hourlyForecast" class="hourly-forecast-section"></div>
+    <div id="errorMessage" class="error hidden">Error: Unable to fetch weather data.</div>
+    <div id="loadingMessage" class="loading hidden">Loading...</div>
+    <div id="cityList" class="city-list">
+      <h3>Recent Cities</h3>
+      <ul id="recentCities"></ul>
+      <button id="clearCities" onclick="clearRecentCities()">Clear</button>
+</div>
+
+
+
+    <div id="timeDisplay">🕒 </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
