@@ -81,6 +81,9 @@ function fetchWeather(query) {
       // Set background video
       updateBackgroundBasedOnWeather(condition);
 
+      // NEW: Update weather suggestion based on condition
+      updateWeatherSuggestion(condition);
+
       // Fetch timezone data
       fetch(`https://api.timezonedb.com/v2.1/get-time-zone?key=${tzdbApiKey}&format=json&by=position&lat=${data.coord.lat}&lng=${data.coord.lon}`)
         .then(res => res.json())
@@ -96,8 +99,41 @@ function fetchWeather(query) {
     })
     .catch(err => {
       alert("Weather fetch failed: " + err.message);
+      // Ensure suggestion box is hidden on error
+      document.getElementById("weatherSuggestionBox").classList.add("hidden");
     });
 }
+
+// NEW FUNCTION: Update Weather Suggestion
+function updateWeatherSuggestion(condition, windSpeed) {
+  const suggestionBox = document.getElementById("weatherSuggestionBox");
+  const suggestionText = document.getElementById("weatherSuggestionText");
+  let advice = "";
+
+  if (condition.includes("rain")) {
+      advice = "🌧️ It's rainy! An umbrella is highly recommended, and travel may be impacted";
+  } else if (condition.includes("drizzle")) {
+      advice = "🌦️ Light drizzle. You might want a jacket or umbrella today.";
+  } else if (condition.includes("clear")) {
+      advice = "☀️ Enjoy the clear skies! Remember to drink water and stay hydrated";
+  } else if (condition.includes("clouds")) {
+      advice = "☁️ It's cloudy. A nice day for a calm walk outside.";
+  } else if (condition.includes("snow")) {
+      advice = "❄️ Snow is expected! Dress warmly and watch your step, as surfaces may be slippery.";
+  } else if (condition.includes("thunderstorm")) {
+      advice = "⛈️ ThThunderstorms are active. Please seek shelter indoors for safety";
+  } else if (condition.includes("mist") || condition.includes("fog") || condition.includes("haze")) {
+      advice = "🌫️ Low visibility due to mist or fog. Drive carefully and think about indoor activities.";
+  } else if (windSpeed > 10) { // Example threshold for 'windy' (adjust as needed)
+      advice = "🌬️ It's quite windy. Make sure loose items are secure and consider indoor plans.";
+  } else {
+      advice = "🌡️ The weather is changing. Stay ready for different conditions.";
+  }
+
+  suggestionText.textContent = advice;
+  suggestionBox.classList.remove("hidden"); // Show the suggestion box
+}
+
 // Fetch 24hr (3-hour interval) forecast and display
 function fetchForecast(lat, lon) {
   const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${weatherApiKey}&units=metric`;
@@ -170,8 +206,8 @@ function startCityClock(zoneName, gmtOffset, data) {
   const offsetHours = gmtOffset / 3600;
   const cityName = data.name;
   const countryName = data.sys.country;
-  const regionName = data.name;
-  const fullLocation = `${cityName}, ${regionName} ${countryName}`.trim();
+  const regionName = data.name; // OpenWeatherMap's 'name' is usually the city name for current weather
+  const fullLocation = `${cityName}, ${countryName}`.trim(); // Removed regionName as it's often redundant with city name
 
   function updateCityClock() {
     const now = new Date();
@@ -200,6 +236,8 @@ function resetWeather() {
   document.getElementById("cityInput").value = "";
   document.getElementById("weatherResult").classList.add("hidden");
   document.getElementById("hourlyForecast").innerHTML = "";
+  // NEW: Hide suggestion box on reset
+  document.getElementById("weatherSuggestionBox").classList.add("hidden");
   clearInterval(cityClockInterval);
 }
 
@@ -226,7 +264,10 @@ cityInput.addEventListener("keydown", function (e) {
 
 cityInput.addEventListener("input", function () {
   const query = cityInput.value.trim();
-  if (query.length < 2) return;
+  if (query.length < 2) {
+    citySuggestions.innerHTML = ""; // Clear suggestions if query is too short
+    return;
+  }
 
   fetch(`https://${geoApiHost}/v1/geo/cities?namePrefix=${query}&limit=10`, {
     method: "GET",
@@ -243,7 +284,7 @@ cityInput.addEventListener("input", function () {
       }
       data.data.forEach(city => {
         const option = document.createElement("option");
-        option.value = city.city;
+        option.value = `${city.city}, ${city.countryCode}`; // Show city and country code for clarity
         citySuggestions.appendChild(option);
       });
     })
@@ -251,42 +292,41 @@ cityInput.addEventListener("input", function () {
       console.error("City suggestion error:", err);
     });
 });
+
 function updateBackgroundBasedOnWeather(condition) {
   const video = document.getElementById("bgVideo");
   let videoSrc;
 
   switch (condition) {
     case "clear":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/rF_6xyohit7ckhp9/videoblocks-cloud-sky-time-lapse-cloud-moving-and-sun-light-4k-resolution-video_s5xkkk5n7__8ac2a8edeef42f75c9434c96fdd677e8__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/855781/855781-hd_1920_1080_24fps.mp4";
       break;
     case "clouds":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/r9E0QYuleiv25jmq9/videoblocks-the-scenic-stormy-clouds-stream-in-the-sky-time-lapse_bezxa1p68__6b820e25cae415ded2220f1d1d46a165__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/4388229/4388229-hd_1920_1080_30fps.mp4";
       break;
     case "rain":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/H67jTiuivkibc7mqx/videoblocks-a173c_st_aqlhnc__6a230d199bb9bcb170ef7e9cc7a35cdc__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/8549483/8549483-uhd_2560_1440_25fps.mp4";
       break;
-      
     case "drizzle":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/ruefkyi-il8e5psf4/videoblocks-rain-3_1_hrzm4n1as__69dd354b69c9a1990faef8a599e6c278__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/5517030/5517030-uhd_2560_1440_30fps.mp4";
       break;
     case "thunderstorm":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/GTYSdDW/thunderstorm-and-dark-clouds-animation_ejd-iaz5g__1f1b022e70def96e5eee43497b25bcc4__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/2657691/2657691-hd_1920_1080_30fps.mp4";
       break;
     case "snow":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/V1xq1AADx/slow-motion-view-of-heavy-snow-fall-in-evergreen-forest_vyhxst3al__ebb581a2518274a9b86b8536dff81027__P360.mp4";
-
+      videoSrc = "https://videos.pexels.com/video-files/6527134/6527134-hd_1920_1080_25fps.mp4";
       break;
     case "fog":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/SE6H2xwPmjlia3kue/videoblocks-smoke-fog-and-rain-pass-through-forest-hills-time-lapse_sxsk91sph__d244147e5c8608cd4cb5c2bc06758c7e__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/28435504/12381755_1920_1080_60fps.mp4";
       break;
     case "mist":
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/SfgTbYmNJXjhkhi5b7/joel-tapernoux-b11-015-3udo7dsvu6__1743c92311729b39bf0beefcf10e442f__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/28435504/12381755_1920_1080_60fps.mp4";
       break;
     case "haze":
-      videoSrc = "https://cdn.coverr.co/videos/coverr-foggy-morning-7926/1080p.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/28435504/12381755_1920_1080_60fps.mp4";
       break;
     default:
-      videoSrc = "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/r9E0QYuleiv25jmq9/videoblocks-the-scenic-stormy-clouds-stream-in-the-sky-time-lapse_bezxa1p68__6b820e25cae415ded2220f1d1d46a165__P360.mp4";
+      videoSrc = "https://videos.pexels.com/video-files/6172016/6172016-hd_1920_1080_24fps.mp4";
       break;
   }
 
@@ -302,4 +342,3 @@ function updateBackgroundBasedOnWeather(condition) {
     video.play().catch(() => {});
   }
 }
-

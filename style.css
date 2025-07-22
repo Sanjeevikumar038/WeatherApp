@@ -391,3 +391,40 @@ button:hover {
   color: #f0f0f0;
   border: 1px solid #555;
 }
+/* Add this to your style.css */
+
+.suggestion-box {
+  margin-top: 20px;
+  padding: 15px;
+  background: #eaf4f4; /* Same as weather-box for consistency */
+  border-radius: 10px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.6s ease-in-out;
+  text-align: center;
+}
+
+.suggestion-box h3 {
+  color: #0077b6;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.suggestion-box p {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Dark mode for suggestion box */
+.dark-mode .suggestion-box {
+  background: #2a2a2a;
+  color: #f0f0f0;
+}
+
+.dark-mode .suggestion-box h3 {
+  color: #00b4d8; /* Slightly different color for dark mode heading */
+}
+
+.dark-mode .suggestion-box p {
+  color: #f0f0f0;
+}

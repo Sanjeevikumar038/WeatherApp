@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weather</title>
-  <link rel="icon" href="weather icon.png" type="image/png" />
-
+  <title>Weather + Time App</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -37,19 +35,14 @@
       <div id="localTime" class="local-time"></div>
     </div>
 
-    <!-- ✅ Make sure this section is outside weatherResult to always be visible -->
-    
     <div id="hourlyForecast" class="hourly-forecast-section"></div>
     <div id="errorMessage" class="error hidden">Error: Unable to fetch weather data.</div>
     <div id="loadingMessage" class="loading hidden">Loading...</div>
-    <div id="cityList" class="city-list">
-      <h3>Recent Cities</h3>
-      <ul id="recentCities"></ul>
-      <button id="clearCities" onclick="clearRecentCities()">Clear</button>
-</div>
 
-
-
+    <div id="weatherSuggestionBox" class="suggestion-box hidden">
+      <h3>💡 Weather Advice</h3>
+      <p id="weatherSuggestionText"></p>
+    </div>
     <div id="timeDisplay">🕒 </div>
   </div>
 
